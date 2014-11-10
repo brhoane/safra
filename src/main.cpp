@@ -1,5 +1,5 @@
 /**
- * @brief Safra Trees
+ * @brief Reads buchi and outputs rabin automaton
  *
  * @author Brandon Hoane (bhoane)
  */
@@ -23,9 +23,9 @@ using namespace _cdm;
 
 static void print_usage(const char* prog_name) {
   std::cout << "Usage: " << prog_name <<
-    "input_wnfa [-v] [-o output_file]\n"
+    " input_wnfa [-v] [-o output_file]\n"
     "\n"           \
-    "Options:\n"   \
+    "Options:"     \
     "\n"           \
     "\t-v:\n"                                              \
     "\t\tPrints generated Safra Trees and transitions\n"   \
@@ -45,7 +45,7 @@ static bool parse_args(Options* opt, int argc, char* argv[]) {
   opt->output_filename = NULL;
   opt->verbose = false;
   int gopt;
-  while ((gopt = getopt(argc, argv, "")) != -1) {
+  while ((gopt = getopt(argc, argv, "vo:")) != -1) {
     switch (gopt) {
     case 'v':
       opt->verbose = true;
@@ -54,17 +54,20 @@ static bool parse_args(Options* opt, int argc, char* argv[]) {
       opt->output_filename = optarg;
       break;
     case '?':
+      if (optopt == 'o') return false;
       std::cerr << "Unknown option: '" << char(optopt) << "'\n";
-      break;
+      return false;
     }
   }
+  return true;
 }
 
 int main(int argc, char* argv[]) {
   Options opt;
+
   if (!parse_args(&opt, argc, argv)) {
     return 1;
   }
-
+  std::cout << opt.input_filename << " -> " << opt.output_filename << "\n";
   return 0;
 }
