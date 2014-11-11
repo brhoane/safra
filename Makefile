@@ -5,7 +5,7 @@ CPPFLAGS=-g -Wall -Werror -Wextra -std=c++11
 LDFLAGS=-g
 LDLIBS=
 
-SRCS=src/main.cpp
+SRCS=src/main.cpp src/automata.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 GOAL=safra
 
@@ -17,7 +17,7 @@ safra: $(OBJS)
 depend: .depend
 
 .depend: $(SRCS)
-	rm -f ./.depend
+	$(RM) ./.depend
 	$(CXX) $(CPPFLAGS) -MM $^>>./.depend;
 
 clean:

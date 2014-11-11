@@ -6,8 +6,8 @@ namespace _cdm {
   typedef int State;
   typedef int Letter;
   struct Transition {
-    letter l;
-    state s;
+    Letter l;
+    State s;
 
     Transition(): l(0),
                   s(0) {}
@@ -17,13 +17,11 @@ namespace _cdm {
   public:
     int num_states;
     int num_letters;
-    Transition *transitions[num_states];
+    Transition **transitions;
 
-    Automata(const char* filename) {
-
-    }
+    Automata(const char *filename);
     virtual ~Automata() {}
-  }
+  };
 
 }
 

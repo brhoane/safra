@@ -9,6 +9,8 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "automata.hpp"
+
 namespace _cdm {
 
   struct Options {
@@ -68,6 +70,6 @@ int main(int argc, char* argv[]) {
   if (!parse_args(&opt, argc, argv)) {
     return 1;
   }
-  std::cout << opt.input_filename << " -> " << opt.output_filename << "\n";
+  Automata b1(opt.input_filename);
   return 0;
 }
