@@ -7,11 +7,12 @@ LDLIBS=
 
 SRCS=src/main.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
+GOAL=safra
 
-all: safra
+all: $(GOAL)
 
 safra: $(OBJS)
-	$(CXX) $(LDFLAGS) -o safra $(OBJS) $(LDLIBS)
+	$(CXX) $(LDFLAGS) -o $(GOAL) $(OBJS) $(LDLIBS)
 
 depend: .depend
 
@@ -20,7 +21,7 @@ depend: .depend
 	$(CXX) $(CPPFLAGS) -MM $^>>./.depend;
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS) $(GOAL)
 
 dist-clean: clean
 	$(RM) *~ .dependtool
