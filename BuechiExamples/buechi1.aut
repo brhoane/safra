@@ -1,4 +1,4 @@
-xBUECHI
+BUECHI
 # Rabin size: 2
 # Rabin transitions: 4
 # Number of states
@@ -14,7 +14,7 @@ xBUECHI
 2  1  2
 # end transitions
 # Buechi initial
-1 
+1
 # Buechi final
-2 
+2
 # Buechi eof
