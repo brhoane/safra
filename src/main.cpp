@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
   if (!parse_args(&opt, argc, argv)) {
     return 1;
   }
-  Automata b1(opt.input_filename);
+  Automaton b1(opt.input_filename);
   std::cout << b1;
   return 0;
 }

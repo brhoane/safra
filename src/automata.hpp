@@ -2,32 +2,33 @@
 #define _cdm_AUTOMATA_HPP_
 
 #include <vector>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/properties.hpp>
 
 namespace _cdm {
 
-  struct Transition {
-    int letter;
-    int state;
+  typedef boost::property<boost::edge_name_t, int> EdgeProperty;
 
-    Transition(int l, int s): letter(l),
-                              state(s) {}
-  };
-  typedef std::vector<std::vector<Transition>> TransitionSet;
-  typedef std::vector<int> StateList;
+  typedef boost::adjacency_list<
+    boost::vecS, boost::vecS, boost::directedS,
+    boost::no_property, EdgeProperty>
 
-  class Automata {
+  Transitions;
+
+  class Automaton {
   public:
-    int num_states;
     int num_letters;
-    TransitionSet transitions;
-    StateList initial;
-    StateList final;
+    Transitions transitions;
+    int initial;
+    int final;
 
-    Automata(const char *filename);
-    virtual ~Automata() {}
-    size_t size() const;
-    friend std::ostream& operator<< (std::ostream& stream, const Automata& aut);
+    Automaton(const char *filename);
+    virtual ~Automaton() {}
+    size_t num_edges() const;
+    size_t num_states() const;
+    friend std::ostream& operator<< (std::ostream& stream, const Automaton& aut);
   };
+
 
 }
 

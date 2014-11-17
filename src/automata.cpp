@@ -5,6 +5,9 @@
 #include <cstring>
 #include <cassert>
 
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphviz.hpp>
+
 #include "automata.hpp"
 
 namespace _cdm {
@@ -19,11 +22,12 @@ namespace _cdm {
     FINAL
   };
 
-  Automata::Automata(const char *filename) {
+  Automaton::Automaton(const char* filename) {
     std::string line;
     std::ifstream myfile(filename);
     int aps = MAGIC;
     int tcount = 0;
+
     if (myfile.is_open()) {
       while (getline(myfile,line)) {
         if (line[0] == '#') continue;
@@ -31,35 +35,39 @@ namespace _cdm {
         case MAGIC:
           assert(line.compare("BUECHI") == 0);
           break;
-        case NUM_STATES:
-          num_states = std::stoi(line);
-          transitions.resize(num_states, std::vector<Transition>());
+        case NUM_STATES: {
+          int num_states = std::stoi(line);
+          transitions = Transitions(num_states);
           break;
+        }
         case NUM_LETTERS:
           num_letters = std::stoi(line);
           break;
         case NUM_TRANSITIONS:
           tcount = std::stoi(line);
+          if (!tcount) aps++;
           break;
         case TRANSITIONS: {
-          if (!tcount) break;
+          char *line_ptr = &line[0];
+          char *nptr = strtok(line_ptr, " ");
+          int state1 = atoi(nptr);
+
+          nptr = strtok(NULL, " "); assert(nptr);
+          int letter = atoi(nptr);
+
+          nptr = strtok(NULL, " "); assert(nptr);
+          int state2 = atoi(nptr);
+
+          boost::add_edge(state1, state2, letter, transitions);
           tcount--;
-          aps--;
-          const char* line_ptr = &line[0];
-          int state1 = atoi(line_ptr) - 1;
-          line_ptr = strchr(line_ptr, ' '); assert(line_ptr);
-          int state2 = atoi(line_ptr) - 1;
-          line_ptr = strchr(line_ptr, ' '); assert(line_ptr);
-          int letter = atoi(line_ptr) - 1;
-          Transition t(letter, state2);
-          transitions[state1].push_back(t);
+          if (tcount) aps--;
           break;
         }
         case INITIAL:
-          initial.push_back(stoi(line) - 1);
+          initial = stoi(line);
           break;
         case FINAL:
-          final.push_back(stoi(line) - 1);
+          final = stoi(line);
           break;
         default:
           break;
@@ -74,34 +82,32 @@ namespace _cdm {
     }
   }
 
-  size_t Automata::size() const {
-    size_t ret = 0;
-    for (auto it = transitions.cbegin(); it != transitions.cend(); ++it) {
-      ret += it->size();
-    }
-    return ret;
+  size_t Automaton::num_edges() const {
+    return boost::num_edges(transitions);
   }
 
-  std::ostream& operator <<(std::ostream& stream, const Automata& aut) {
+  size_t Automaton::num_states() const {
+    return boost::num_vertices(transitions);
+  }
+
+  std::ostream& operator <<(std::ostream& stream, const Automaton& aut) {
     stream << "BUECHI\n"
-           << aut.num_states << "\n"
+           << (aut.num_states()) << "\n"
            << aut.num_letters << "\n"
-           << (aut.size()) << "\n";
+           << (aut.num_edges()) << "\n";
 
-    for (size_t i = 0; i < aut.transitions.size(); i++) {
-      for (auto it = aut.transitions[i].cbegin();
-           it != aut.transitions[i].cend(); ++it) {
+    boost::graph_traits<Transitions>::edge_iterator ei, ei_end;
+    for (tie(ei, ei_end) = boost::edges(aut.transitions); ei != ei_end; ++ei) {
 
-
-        stream << i
-               << ' ' << it->state
-               << ' ' << it->letter
-               << "\n";
-      }
+      int letter = boost::get(boost::edge_name_t(), aut.transitions, *ei);
+      std::cout << source(*ei, aut.transitions) << ' '
+                << letter << ' '
+                << target(*ei, aut.transitions) << "\n";
     }
-    std::cout << "hi\n";
-    stream << aut.initial[0] << "\n"
-           << aut.final[0] << "\n";
+
+    stream << aut.initial << "\n"
+           << aut.final << "\n";
     return stream;
   }
+
 }
