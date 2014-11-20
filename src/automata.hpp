@@ -7,18 +7,17 @@
 
 namespace _cdm {
 
-  typedef boost::property<boost::edge_name_t, int> EdgeProperty;
+  typedef boost::property<boost::edge_name_t, int> edge_property;
 
   typedef boost::adjacency_list<
     boost::vecS, boost::vecS, boost::directedS,
-    boost::no_property, EdgeProperty>
-
-  Transitions;
+    boost::no_property, edge_property>
+  transition_graph;
 
   class Automaton {
   public:
     int num_letters;
-    Transitions transitions;
+    transition_graph transitions;
     int initial;
     int final;
 

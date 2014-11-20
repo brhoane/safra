@@ -37,7 +37,7 @@ namespace _cdm {
           break;
         case NUM_STATES: {
           int num_states = std::stoi(line);
-          transitions = Transitions(num_states);
+          transitions = transition_graph(num_states);
           break;
         }
         case NUM_LETTERS:
@@ -96,7 +96,7 @@ namespace _cdm {
            << aut.num_letters << "\n"
            << (aut.num_edges()) << "\n";
 
-    boost::graph_traits<Transitions>::edge_iterator ei, ei_end;
+    boost::graph_traits<transition_graph>::edge_iterator ei, ei_end;
     for (tie(ei, ei_end) = boost::edges(aut.transitions); ei != ei_end; ++ei) {
 
       int letter = boost::get(boost::edge_name_t(), aut.transitions, *ei);
