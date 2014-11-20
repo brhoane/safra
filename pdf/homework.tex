@@ -1,0 +1,84 @@
+% You should title the file with a .tex extension (hw1.tex, for example)
+\documentclass[11pt]{article}
+
+\usepackage{enumerate}
+\usepackage{textcomp}
+\usepackage{fancyhdr}
+\usepackage{amsmath, amsfonts, amsthm, amssymb, mathtools}
+\usepackage{hyperref}
+
+\oddsidemargin0cm
+\topmargin-2cm     %I recommend adding these three lines to increase the
+\textwidth16.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm
+
+\newcommand{\question}[2] {\vspace{.25in} \hrule\vspace{0.5em}
+\noindent{\bf #1: #2} \vspace{0.5em}
+\hrule \vspace{.10in}}
+\renewcommand{\part}[1] {\vspace{.10in} {\bf (#1)}}
+
+\newcommand{\myname}{Brandon Hoane}
+\newcommand{\myandrew}{bhoane@andrew.cmu.edu}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{\textbf{Project Proposal}}}      % Note the different brackets!
+\rhead{\fancyplain{}{\myname\\ \myandrew}}
+\chead{\fancyplain{}{CDM }}
+
+\begin{document}
+
+\medskip                        % Skip a "medium" amount of space
+                                % (latex determines what medium is)
+                                % Also try: \bigskip, \littleskip
+
+\thispagestyle{plain}
+\begin{center}                  % Center the following lines
+{\Large CDM Project Proposal} \\
+\myname \\
+\myandrew \\
+\today \\
+\end{center}
+
+\subsection*{Proposal}
+I will be implementing Safra's Determinization Algorithm for
+B\"uchi Automata. Given a B\"uchi Automaton, we want to output a
+Rabin Automata which recognizes the same $\omega$-language.
+
+\subsection*{Goals}
+\begin{itemize}
+\item Correctly and concisely implement Safra's algorithm.
+\item Convert examples in a reasonable amount of time.
+\end{itemize}
+
+\subsection*{Tools}
+I'm using C++ implement Safra's algorithm.
+Both automata and Safra trees will be represented using the Boost Graph Library.
+The BGL makes it simple to swap out the internal representation of the graphs,
+which should allow for easier optimization.
+Furthermore, it provides hooks into Graphviz, which will allow
+me to visualize the inputs and results.
+
+\subsection*{Concerns}
+\begin{itemize}
+\item How can I show that conversions are performed correctly?
+  It seems difficult to show that two $\omega$-automata are equivalent.
+\item
+  We know that we can determine acceptance on
+  constant, periodic, and ultimately periodic inputs.
+  It would be nice to implement these algorithms to
+  demonstrate correctness, however this seems a little
+  outside the scope of this project.
+  Perhaps as a stretch goal.
+\end{itemize}
+
+\subsection*{Links}
+\begin{itemize}
+\item \href{http://www.boost.org/doc/libs/1_57_0/libs/graph/doc/}
+  {Boost Graph Library}
+\item \href{http://www.graphviz.org/}{Graphviz}
+\end{itemize}
+
+\end{document}
