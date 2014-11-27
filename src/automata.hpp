@@ -1,34 +1,35 @@
 #ifndef _cdm_AUTOMATA_HPP_
 #define _cdm_AUTOMATA_HPP_
 
-#include <vector>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/properties.hpp>
+#include <map>
 
 namespace _cdm {
 
-  typedef boost::property<boost::edge_name_t, int> edge_property;
-
-  typedef boost::adjacency_list<
-    boost::vecS, boost::vecS, boost::directedS,
-    boost::no_property, edge_property>
-  transition_graph;
+  typedef std::pair<int, int> transition;
+  typedef std::pair<transition, int> transition_edge;
+  typedef std::multimap<transition, int> transition_graph;
 
   class Automaton {
   public:
     int num_letters;
+    int num_states;
+    int num_edges;
     transition_graph transitions;
-    int initial;
-    int final;
-
-    Automaton(const char *filename);
-    virtual ~Automaton() {}
-    size_t num_edges() const;
-    size_t num_states() const;
-    friend std::ostream& operator<< (std::ostream& stream, const Automaton& aut);
   };
 
+  class Buechi : public Automaton {
+  public:
+    Buechi(const char *filename);
+    int initial;
+    int final;
+    friend std::ostream& operator<< (std::ostream& stream, const Buechi& aut);
+  };
 
+  class Rabin : public Automaton {
+  public:
+    Rabin(Buechi b);
+    friend std::ostream& operator<< (std::ostream& stream, const Rabin& aut);
+  };
 }
 
 #endif

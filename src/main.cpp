@@ -26,14 +26,14 @@ using namespace _cdm;
 static void print_usage(const char* prog_name) {
   std::cout << "Usage: " << prog_name <<
     " input_wnfa [-v] [-o output_file]\n"
-    "\n"           \
-    "Options:"     \
-    "\n"           \
-    "\t-v:\n"                                              \
-    "\t\tPrints generated Safra Trees and transitions\n"   \
-    "\tinput_wnfa:\n"                                      \
-    "\t\tThe Buchi Automata to load and determinize.\n"    \
-    "\t-o output_file:\n"                                              \
+    "\n"                                                                \
+    "Options:"                                                          \
+    "\n"                                                                \
+    "\t-v:\n"                                                           \
+    "\t\tPrints generated Safra Trees and transitions\n"                \
+    "\tinput_wnfa:\n"                                                   \
+    "\t\tThe Buchi Automata to load and determinize.\n"                 \
+    "\t-o output_file:\n"                                               \
     "\t\tThe output file in which to write the Rabin Automaton.\n";
   }
 
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
   if (!parse_args(&opt, argc, argv)) {
     return 1;
   }
-  Automaton b1(opt.input_filename);
+  Buechi b1(opt.input_filename);
   std::cout << b1;
   return 0;
 }

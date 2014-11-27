@@ -5,9 +5,6 @@
 #include <cstring>
 #include <cassert>
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/graphviz.hpp>
-
 #include "automata.hpp"
 
 namespace _cdm {
@@ -22,7 +19,7 @@ namespace _cdm {
     FINAL
   };
 
-  Automaton::Automaton(const char* filename) {
+  Buechi::Buechi(const char* filename) {
     std::string line;
     std::ifstream myfile(filename);
     int aps = MAGIC;
@@ -36,8 +33,8 @@ namespace _cdm {
           assert(line.compare("BUECHI") == 0);
           break;
         case NUM_STATES: {
-          int num_states = std::stoi(line);
-          transitions = transition_graph(num_states);
+          num_states = std::stoi(line);
+          transitions = transition_graph();
           break;
         }
         case NUM_LETTERS:
@@ -45,6 +42,7 @@ namespace _cdm {
           break;
         case NUM_TRANSITIONS:
           tcount = std::stoi(line);
+          num_edges = tcount;
           if (!tcount) aps++;
           break;
         case TRANSITIONS: {
@@ -57,8 +55,9 @@ namespace _cdm {
 
           nptr = strtok(NULL, " "); assert(nptr);
           int state2 = atoi(nptr);
-
-          boost::add_edge(state1, state2, letter, transitions);
+          
+          transition_edge e(transition(state1,letter), state2);
+          transitions.insert(e);
           tcount--;
           if (tcount) aps--;
           break;
@@ -82,29 +81,18 @@ namespace _cdm {
     }
   }
 
-  size_t Automaton::num_edges() const {
-    return boost::num_edges(transitions);
-  }
-
-  size_t Automaton::num_states() const {
-    return boost::num_vertices(transitions);
-  }
-
-  std::ostream& operator <<(std::ostream& stream, const Automaton& aut) {
+  std::ostream& operator <<(std::ostream& stream, const Buechi& aut) {
     stream << "BUECHI\n"
-           << (aut.num_states()) << "\n"
+           << aut.num_states << "\n"
            << aut.num_letters << "\n"
-           << (aut.num_edges()) << "\n";
-
-    boost::graph_traits<transition_graph>::edge_iterator ei, ei_end;
-    for (tie(ei, ei_end) = boost::edges(aut.transitions); ei != ei_end; ++ei) {
-
-      int letter = boost::get(boost::edge_name_t(), aut.transitions, *ei);
-      std::cout << source(*ei, aut.transitions) << ' '
-                << letter << ' '
-                << target(*ei, aut.transitions) << "\n";
+           << aut.num_edges << "\n";
+    
+    for (auto it = aut.transitions.cbegin(); it != aut.transitions.cend(); ++it) {
+      std::cout << it->first.first << ' '
+                << it->first.second << ' '
+                << it->second << "\n";
     }
-
+    
     stream << aut.initial << "\n"
            << aut.final << "\n";
     return stream;
