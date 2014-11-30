@@ -5,25 +5,27 @@
  */
 
 #include <stdlib.h>
+#include <unistd.h>
+#include <assert.h>
 #include <string>
 #include <iostream>
-#include <unistd.h>
 
 #include "automata.hpp"
+#include "safra.hpp"
 
 namespace _cdm {
-
+  
   struct Options {
     bool verbose;
     const char* input_filename;
     const char* output_filename;
   };
 
-} /* _cdm */
+}
 
 using namespace _cdm;
 
-static void print_usage(const char* prog_name) {
+void print_usage(const char* prog_name) {
   std::cout << "Usage: " << prog_name <<
     " input_wnfa [-v] [-o output_file]\n"
     "\n"                                                                \
@@ -37,7 +39,7 @@ static void print_usage(const char* prog_name) {
     "\t\tThe output file in which to write the Rabin Automaton.\n";
   }
 
-static bool parse_args(Options* opt, int argc, char* argv[]) {
+bool parse_args(Options* opt, int argc, char* argv[]) {
   if (argc < 2) {
     print_usage(argv[0]);
     return false;
@@ -72,5 +74,8 @@ int main(int argc, char* argv[]) {
   }
   Buechi b1(opt.input_filename);
   std::cout << b1;
+  Safra s1(b1);
+  assert(is_safra_tree(s1));
+  Safra s2 = s1.next_tree(0);
   return 0;
 }

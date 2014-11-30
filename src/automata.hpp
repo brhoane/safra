@@ -1,6 +1,7 @@
 #ifndef _cdm_AUTOMATA_HPP_
 #define _cdm_AUTOMATA_HPP_
 
+#include <iostream>
 #include <map>
 
 namespace _cdm {
@@ -9,26 +10,33 @@ namespace _cdm {
   typedef std::pair<transition, int> transition_edge;
   typedef std::multimap<transition, int> transition_graph;
 
-  class Automaton {
+  class FiniteStateMachine {
   public:
     int num_letters;
     int num_states;
     int num_edges;
-    transition_graph transitions;
-  };
+    transition_graph edges;
 
-  class Buechi : public Automaton {
+    FiniteStateMachine() {}
+    
+    friend std::ostream& operator<< (std::ostream& stream,
+                                     const FiniteStateMachine& fsm);
+  };
+  
+  class Buechi : public FiniteStateMachine {
   public:
-    Buechi(const char *filename);
     int initial;
     int final;
-    friend std::ostream& operator<< (std::ostream& stream, const Buechi& aut);
+    
+    Buechi(const char* filename);
+    
+    friend std::ostream& operator<< (std::ostream& stream, const Buechi& bfsm);
   };
 
-  class Rabin : public Automaton {
+  class Rabin : public FiniteStateMachine {
   public:
-    Rabin(Buechi b);
-    friend std::ostream& operator<< (std::ostream& stream, const Rabin& aut);
+    /* (L,R) pairs */
+    Rabin(Buechi& b);
   };
 }
 

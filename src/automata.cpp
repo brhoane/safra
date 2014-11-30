@@ -1,11 +1,11 @@
+#include "automata.hpp"
+
+#include <string.h>
+#include <assert.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cstring>
-#include <cassert>
-
-#include "automata.hpp"
 
 namespace _cdm {
   // Automata Parsing State
@@ -32,11 +32,9 @@ namespace _cdm {
         case MAGIC:
           assert(line.compare("BUECHI") == 0);
           break;
-        case NUM_STATES: {
+        case NUM_STATES:
           num_states = std::stoi(line);
-          transitions = transition_graph();
           break;
-        }
         case NUM_LETTERS:
           num_letters = std::stoi(line);
           break;
@@ -57,7 +55,7 @@ namespace _cdm {
           int state2 = atoi(nptr);
           
           transition_edge e(transition(state1,letter), state2);
-          transitions.insert(e);
+          edges.insert(e);
           tcount--;
           if (tcount) aps--;
           break;
@@ -80,21 +78,25 @@ namespace _cdm {
       abort();
     }
   }
-
-  std::ostream& operator <<(std::ostream& stream, const Buechi& aut) {
-    stream << "BUECHI\n"
-           << aut.num_states << "\n"
-           << aut.num_letters << "\n"
-           << aut.num_edges << "\n";
-    
-    for (auto it = aut.transitions.cbegin(); it != aut.transitions.cend(); ++it) {
-      std::cout << it->first.first << ' '
-                << it->first.second << ' '
-                << it->second << "\n";
+  std::ostream& operator <<(std::ostream& stream, const FiniteStateMachine& fsm) {
+    for (auto it = fsm.edges.cbegin(); it != fsm.edges.cend(); ++it) {
+      stream << it->first.first << ' '  // from state
+             << it->first.second << ' ' // letter 
+             << it->second << "\n";     // to state
     }
+    return stream;
+  }
+
+  std::ostream& operator <<(std::ostream& stream, const Buechi& bfsm) {
+    stream << "BUECHI\n"
+           << bfsm.num_states << "\n"
+           << bfsm.num_letters << "\n"
+           << bfsm.num_edges << "\n";
     
-    stream << aut.initial << "\n"
-           << aut.final << "\n";
+    stream << (FiniteStateMachine)bfsm;
+    
+    stream << bfsm.initial << "\n"
+           << bfsm.final << "\n";
     return stream;
   }
 
