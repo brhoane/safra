@@ -60,7 +60,7 @@ namespace _cdm {
       for (auto it = range.first; it != range.second; ++it) {
         ret.label.insert(it->second);
       }
-    } 
+    }
     for (auto it = other.children.cbegin(); it != other.children.cend(); ++it) {
       ret.children.push_back(copy_unmark_update(*it, letter));
     }
@@ -80,6 +80,31 @@ namespace _cdm {
       child.label.insert(buechi.final);
       sn.children.push_back(child);
     }
+  }
+  
+  /* Remove members of seen from the label of sn.
+   * Scans left to right, updating seen with label elements.
+   * Returns true if the label becomes empty and the node should be removed.
+   */
+  bool scan_and_remove_seen(SafraNode& sn, std::set<int>& seen) {
+    sn.label.erase(seen.begin(), seen.end());
+    if (sn.label.empty()) {
+      return true;
+    }
+    //seen.insert(sn.label.begin(), sn.label.end());
+    std::vector<std::vector<SafraNode>::iterator> remove;
+    for (auto it = sn.children.begin(); it != sn.children.end(); ++it) {
+      if (scan_and_remove_seen(*it, seen)) {
+        remove.push_back(it);
+      }
+    }
+    
+    return false;
+  }
+  
+  void SafraGraph::horizontal_merge_and_kill(SafraNode& sn) {
+    std::set<int> seen;
+    scan_and_remove_seen(sn, seen);
   }
   
   SafraTree SafraGraph::next_tree(SafraTree& st, int letter) {

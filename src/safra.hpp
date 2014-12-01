@@ -11,6 +11,8 @@
 
 namespace _cdm {
   
+  typedef std::priority_queue<int, std::vector<int>, std::greater<int>> int_pool;
+
   struct SafraNode {
     int name;
     std::set<int> label;
@@ -20,8 +22,6 @@ namespace _cdm {
   
   std::ostream& operator<< (std::ostream& stream, const SafraNode& sn);
   
-  typedef std::priority_queue<int, std::vector<int>, std::greater<int>>
-    int_pool;
   
   class SafraTree {
   public:
@@ -38,6 +38,7 @@ namespace _cdm {
   private:
     SafraNode copy_unmark_update(const SafraNode& other, int letter);
     void create(SafraNode& sn, int_pool& pool);
+    void horizontal_merge_and_kill(SafraNode& sn);
   public:
     Buechi buechi;
     
