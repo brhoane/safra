@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <iostream>
 
 #include "automata.hpp"
 
@@ -17,30 +18,32 @@ namespace _cdm {
     std::vector<SafraNode> children;
   };
   
-  //  typedef std::priority_queue<int, Compare = less<typename Container::value_type>>
-  //  int_pool;
+  std::ostream& operator<< (std::ostream& stream, const SafraNode& sn);
+  
+  typedef std::priority_queue<int, std::vector<int>, std::greater<int>>
+    int_pool;
   
   class SafraTree {
-  private:
-    std::priority_queue<int> name_pool;
   public:
+    int_pool name_pool;
     SafraNode root;
     
     SafraTree() = default;
     SafraTree(const Buechi& b);
     
-    void add_child(SafraNode& sn, SafraNode child);    
     bool is_safra_tree();
   };
   
   class SafraGraph {
+  private:
+    SafraNode copy_unmark_update(const SafraNode& other, int letter);
+    void create(SafraNode& sn, int_pool& pool);
   public:
     Buechi buechi;
     
     SafraGraph() = delete;
     SafraGraph(const Buechi b) : buechi(b) {}
     
-    SafraNode copy_unmark_update(const SafraNode& other, int letter);
     SafraTree next_tree(SafraTree& st, int letter);
   };
 }
