@@ -1,7 +1,7 @@
-CC=gcc
-CXX=g++
+CC=clang
+CXX=clang++
 RM=rm -f
-CPPFLAGS=-g -Wall -Werror -Wextra -Wno-deprecated -std=c++11
+CPPFLAGS=-g -Wall -Werror -Wextra -std=c++11
 LDFLAGS=-g
 LDLIBS=
 
