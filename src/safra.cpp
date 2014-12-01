@@ -6,39 +6,45 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
-#include <typeinfo>
 
 namespace _cdm {
   
-  Safra::Safra(const Buechi& b) {
+  SafraTree::SafraTree(const Buechi& b) {
     root.name = 1;
     root.mark = b.initial == b.final;
     root.label.insert(b.initial);
   }
   
-  void unmark(SafraNode& sn) {
-    sn.mark = false;
-    std::for_each(sn.children.begin(), sn.children.end(), unmark);
-  }
-  
-  void update(transition_graph tg, int letter, SafraNode& sn) {
-    std::set<int> newlabel;
-    for (auto state = sn.label.cbegin(); state != sn.label.cend(); ++state) {
-      transition key(state, letter);
-      auto range = tg.equal_range(key);
+  SafraNode SafraGraph::copy_unmark_update(const SafraNode& other, int letter) {
+    SafraNode ret;
+    ret.name = other.name;
+    ret.mark = false;
+
+    for (auto state = other.label.cbegin(); state != other.label.cend(); ++state) {
+      transition key(*state, letter);
+      auto range = buechi.edges.equal_range(key);
       for (auto it = range.first; it != range.second; ++it) {
-        transition_edge edge(key, *it);
-        newlabel.append(edge);
+        ret.label.insert(it->second);
       }
     }
+    for (auto it = other.children.cbegin(); it != other.children.cend(); ++it) {
+      ret.children.push_back(copy_unmark_update(*it, letter));
+    }
+    return ret;
   }
   
-  Safra Safra::next_tree(int letter) {
-    Safra ret(*this);
-    (void)letter;
+  SafraTree SafraGraph::next_tree(SafraTree& st, int letter) {
+    SafraTree ret;
     
-    unmark(ret.root);
+    ret.root = copy_unmark_update(st.root, letter);
+    
     return ret;
+  }
+
+  void SafraTree::add_child(SafraNode& sn, SafraNode child) {
+    child.name = name_pool.top();
+    name_pool.pop();
+    sn.children.push_back(child);
   }
 
   bool is_safra_node(const SafraNode& sn) {
@@ -59,8 +65,8 @@ namespace _cdm {
     return std::all_of(sn.children.cbegin(), sn.children.cend(), is_safra_node);
   }
 
-  bool is_safra_tree(const Safra& s) {
-    return is_safra_node(s.root);
+  bool SafraTree::is_safra_tree() {
+    return is_safra_node(root);
   }
   
 }

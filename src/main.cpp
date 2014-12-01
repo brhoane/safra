@@ -74,8 +74,5 @@ int main(int argc, char* argv[]) {
   }
   Buechi b1(opt.input_filename);
   std::cout << b1;
-  Safra s1(b1);
-  assert(is_safra_tree(s1));
-  Safra s2 = s1.next_tree(0);
   return 0;
 }

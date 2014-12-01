@@ -18,7 +18,7 @@ namespace _cdm {
     INITIAL,
     FINAL
   };
-
+  
   Buechi::Buechi(const char* filename) {
     std::string line;
     std::ifstream myfile(filename);
@@ -78,6 +78,7 @@ namespace _cdm {
       abort();
     }
   }
+
   std::ostream& operator <<(std::ostream& stream, const FiniteStateMachine& fsm) {
     for (auto it = fsm.edges.cbegin(); it != fsm.edges.cend(); ++it) {
       stream << it->first.first << ' '  // from state
