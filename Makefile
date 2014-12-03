@@ -1,5 +1,5 @@
-CC=clang
-CXX=clang++
+CC=gcc
+CXX=g++
 RM=rm -f
 CPPFLAGS=-g -Wall -Werror -Wextra -std=c++11
 LDFLAGS=-g

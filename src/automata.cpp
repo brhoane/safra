@@ -18,7 +18,7 @@ namespace _cdm {
     INITIAL,
     FINAL
   };
-  
+
   Buechi::Buechi(const char* filename) {
     std::string line;
     std::ifstream myfile(filename);
@@ -53,7 +53,7 @@ namespace _cdm {
 
           nptr = strtok(NULL, " "); assert(nptr);
           int state2 = atoi(nptr);
-          
+
           transition_edge e(transition(state1,letter), state2);
           edges.insert(e);
           tcount--;
@@ -82,7 +82,7 @@ namespace _cdm {
   std::ostream& operator <<(std::ostream& stream, const FiniteStateMachine& fsm) {
     for (auto it = fsm.edges.cbegin(); it != fsm.edges.cend(); ++it) {
       stream << it->first.first << ' '  // from state
-             << it->first.second << ' ' // letter 
+             << it->first.second << ' ' // letter
              << it->second << "\n";     // to state
     }
     return stream;
@@ -93,11 +93,11 @@ namespace _cdm {
            << bfsm.num_states << "\n"
            << bfsm.num_letters << "\n"
            << bfsm.num_edges << "\n";
-    
+
     stream << (FiniteStateMachine)bfsm;
-    
+
     stream << bfsm.initial << "\n"
-           << bfsm.final << "\n";
+           << bfsm.final;
     return stream;
   }
 

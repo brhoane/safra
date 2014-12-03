@@ -2,30 +2,46 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <assert.h>
 #include <string>
 #include <iostream>
 #include <algorithm>
 #include <functional>
 
 namespace _cdm {
-  
+
+  bool SafraNode::operator==(const SafraNode &other) const {
+    if (name != other.name || mark != other.mark) {
+      return false;
+    }
+    auto it = label.begin();
+    auto oit = label.end();
+    for (; it != label.end() && oit != other.label.end(); ++it, ++oit) {
+      if (*it != *oit) return false;
+    }
+    return it == label.end() && oit == other.label.end();
+  }
+
   std::ostream& operator<< (std::ostream& stream, const SafraNode& sn) {
     stream << sn.name << ';';
     for (auto it = sn.label.cbegin(); it != sn.label.cend(); ++it) {
-      stream << (*it) << ',';
+      stream << (*it) << ' ';
+    }
+    if (sn.mark) {
+      stream << '!';
     }
     return stream;
   }
-  
+
   SafraTree::SafraTree(const Buechi& b) {
     root.name = 1;
     root.mark = b.initial == b.final;
     root.label.insert(b.initial);
-    
-    for (int i = 2; i < b.num_states; i++) {
+
+    for (int i = 2; i <= b.num_states * 2; i++) {
       name_pool.push(i);
     }
-  }  
+  }
 
   bool is_safra_node(const SafraNode& sn) {
     std::set<int> seen;
@@ -48,12 +64,26 @@ namespace _cdm {
   bool SafraTree::is_safra_tree() {
     return is_safra_node(root);
   }
- 
+
+  void print_node(std::ostream& stream, const SafraNode& sn, int depth) {
+    for (int i=0; i < depth; i++) {
+      stream << '\t';
+    }
+    stream << sn << '\n';
+    for (auto it = sn.children.cbegin(); it != sn.children.cend(); ++it) {
+      print_node(stream, *it, depth+1);
+    }
+  }
+
+  std::ostream& operator<< (std::ostream& stream, const SafraTree& st) {
+    print_node(stream, st.root, 0);
+    return stream;
+  }
+
   SafraNode SafraGraph::copy_unmark_update(const SafraNode& other, int letter) {
     SafraNode ret;
     ret.name = other.name;
     ret.mark = false;
-
     for (auto state = other.label.cbegin(); state != other.label.cend(); ++state) {
       transition key(*state, letter);
       auto range = buechi.edges.equal_range(key);
@@ -81,36 +111,68 @@ namespace _cdm {
       sn.children.push_back(child);
     }
   }
-  
+
   /* Remove members of seen from the label of sn.
    * Scans left to right, updating seen with label elements.
-   * Returns true if the label becomes empty and the node should be removed.
+   * Returns true if the label does not become empty and the node should be kept.
    */
   bool scan_and_remove_seen(SafraNode& sn, std::set<int>& seen) {
-    sn.label.erase(seen.begin(), seen.end());
+    // seen = labels to the left of sn
+    for (auto it = seen.begin(); it != seen.end(); ++it) {
+      sn.label.erase(*it);
+    }
     if (sn.label.empty()) {
-      return true;
+      return false;
     }
     //seen.insert(sn.label.begin(), sn.label.end());
-    std::vector<std::vector<SafraNode>::iterator> remove;
+    std::vector<SafraNode> remaining_children;
     for (auto it = sn.children.begin(); it != sn.children.end(); ++it) {
+      // seen = labels to the left of sn and in children up to it
       if (scan_and_remove_seen(*it, seen)) {
-        remove.push_back(it);
+        remaining_children.push_back(*it);
       }
     }
-    
-    return false;
+    sn.children = remaining_children;
+    seen.insert(sn.label.begin(), sn.label.end());
+    return true;
   }
-  
+
   void SafraGraph::horizontal_merge_and_kill(SafraNode& sn) {
     std::set<int> seen;
     scan_and_remove_seen(sn, seen);
   }
-  
+
+  void SafraGraph::vertical_merge(SafraNode& sn) {
+    std::set<int> seen;
+    for (auto it = sn.children.begin(); it != sn.children.end(); ++it) {
+      seen.insert(it->label.begin(), it->label.end());
+    }
+    if (seen.size() == sn.label.size()) {
+      sn.mark = true;
+      sn.children.erase(sn.children.begin(), sn.children.end());
+    } else {
+      for (auto it = sn.children.begin(); it != sn.children.end(); ++it) {
+        vertical_merge(*it);
+      }
+    }
+  }
+
   SafraTree SafraGraph::next_tree(SafraTree& st, int letter) {
-    SafraTree ret;    
+    assert(st.is_safra_tree());
+
+    SafraTree ret;
+    //std::cout << "ORIGINAL - " << letter << " ->\n" << st << "\n";
     ret.root = copy_unmark_update(st.root, letter);
+    //std::cout << "UNMARK UPDATE\n" << ret << "\n";
+    ret.name_pool = int_pool(st.name_pool);
+    create(ret.root, ret.name_pool);
+    //std::cout << "CREATE\n" << ret << "\n";
+    horizontal_merge_and_kill(ret.root);
+    //std::cout << "HMERGE KILL\n" << ret << "\n";
+    vertical_merge(ret.root);
+    //std::cout << "VMERGE\n" << ret << "\n";
+    std::cout << (ret == ret);
     return ret;
   }
- 
+
 }

@@ -14,7 +14,7 @@
 #include "safra.hpp"
 
 namespace _cdm {
-  
+
   struct Options {
     bool verbose;
     const char* input_filename;
@@ -73,6 +73,9 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   Buechi b1(opt.input_filename);
-  std::cout << b1;
+  std::cout << b1 << "\n";
+  SafraGraph sg(b1);
+  SafraTree st(b1);
+  sg.next_tree(st, 1);
   return 0;
 }

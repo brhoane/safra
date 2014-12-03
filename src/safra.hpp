@@ -10,7 +10,7 @@
 #include "automata.hpp"
 
 namespace _cdm {
-  
+
   typedef std::priority_queue<int, std::vector<int>, std::greater<int>> int_pool;
 
   struct SafraNode {
@@ -18,33 +18,38 @@ namespace _cdm {
     std::set<int> label;
     bool mark;
     std::vector<SafraNode> children;
+    bool operator==(const SafraNode &other) const;
   };
-  
   std::ostream& operator<< (std::ostream& stream, const SafraNode& sn);
-  
-  
+
   class SafraTree {
   public:
     int_pool name_pool;
     SafraNode root;
-    
+
     SafraTree() = default;
     SafraTree(const Buechi& b);
-    
+
     bool is_safra_tree();
+    friend std::ostream& operator<< (std::ostream& stream, const SafraTree& st);
+
+    bool operator==(const SafraTree &other) const {
+      return root == other.root;
+    }
   };
-  
+
   class SafraGraph {
   private:
     SafraNode copy_unmark_update(const SafraNode& other, int letter);
     void create(SafraNode& sn, int_pool& pool);
     void horizontal_merge_and_kill(SafraNode& sn);
+    void vertical_merge(SafraNode& sn);
   public:
     Buechi buechi;
-    
+
     SafraGraph() = delete;
     SafraGraph(const Buechi b) : buechi(b) {}
-    
+
     SafraTree next_tree(SafraTree& st, int letter);
   };
 }
