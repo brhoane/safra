@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <map>
 #include <iostream>
 
 #include "automata.hpp"
@@ -51,6 +52,7 @@ namespace _cdm {
     SafraGraph(const Buechi b) : buechi(b) {}
 
     SafraTree next_tree(SafraTree& st, int letter);
+    Rabin make_rabin();
   };
 }
 

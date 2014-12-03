@@ -15,7 +15,7 @@ namespace _cdm {
       return false;
     }
     auto it = label.begin();
-    auto oit = label.end();
+    auto oit = other.label.begin();
     for (; it != label.end() && oit != other.label.end(); ++it, ++oit) {
       if (*it != *oit) return false;
     }
@@ -171,8 +171,30 @@ namespace _cdm {
     //std::cout << "HMERGE KILL\n" << ret << "\n";
     vertical_merge(ret.root);
     //std::cout << "VMERGE\n" << ret << "\n";
-    std::cout << (ret == ret);
     return ret;
   }
 
+  Rabin SafraGraph::make_rabin() {
+    std::vector<SafraTree> trees;
+    trees.push_back(SafraTree(buechi));
+
+    Rabin r;
+    r.num_states = 1;
+    r.num_letters = buechi.num_letters;
+
+    for (unsigned int i=0; i < trees.size(); i++) {
+      for (int letter=1; letter < r.num_letters; letter++) {
+        SafraTree st = next_tree(trees[i], letter);
+        bool exists = false;
+        for (auto it = trees.begin(); it != trees.end(); ++it) {
+          if (st == *it) exists = true;
+        }
+        if (!exists) {
+          trees.push_back(st);
+          //r.edges
+        }
+      }
+    }
+    return r;
+  }
 }

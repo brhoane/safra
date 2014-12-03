@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
   Buechi b1(opt.input_filename);
   std::cout << b1 << "\n";
   SafraGraph sg(b1);
-  SafraTree st(b1);
-  sg.next_tree(st, 1);
+  Rabin r1 = sg.make_rabin();
+
   return 0;
 }
