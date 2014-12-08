@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #include "automata.hpp"
 #include "safra.hpp"
@@ -77,6 +78,7 @@ int main(int argc, char* argv[]) {
   std::cout << b1 << "\n";
   SafraGraph sg(b1);
   Rabin r1 = sg.make_rabin();
-  print_automaton(r1);
+  std::ofstream graph_out("graphs/graph.dot");
+  print_automaton(graph_out, r1);
   return 0;
 }
