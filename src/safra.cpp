@@ -161,7 +161,7 @@ namespace _cdm {
     assert(st.is_safra_tree());
 
     SafraTree ret;
-    //std::cout << "ORIGINAL - " << letter << " ->\n" << st << "\n";
+    //std::cout << "LETTER - " << letter << "\n";
     ret.root = copy_unmark_update(st.root, letter);
     //std::cout << "UNMARK UPDATE\n" << ret << "\n";
     ret.name_pool = int_pool(st.name_pool);
@@ -183,18 +183,19 @@ namespace _cdm {
     r.num_letters = buechi.num_letters;
 
     for (unsigned int i=0; i < trees.size(); i++) {
-      for (int letter=1; letter < r.num_letters; letter++) {
+      for (int letter=1; letter <= r.num_letters; letter++) {
         SafraTree st = next_tree(trees[i], letter);
-        bool exists = false;
-        for (auto it = trees.begin(); it != trees.end(); ++it) {
-          if (st == *it) exists = true;
-        }
-        if (!exists) {
+        std::cout << trees[i] << "EDGE " << letter << " TO\n" << st << "\n";
+
+        auto find_tree = std::find(trees.begin(), trees.end(), st);
+        if (find_tree == trees.end()) {
           trees.push_back(st);
-          //r.edges
         }
       }
     }
+    //for (auto it = trees.begin(); it != trees.end(); ++it) {
+    //  std::cout << *it << "\n";
+    //}
     return r;
   }
 }

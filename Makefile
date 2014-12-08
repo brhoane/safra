@@ -5,7 +5,7 @@ CPPFLAGS=-g -Wall -Werror -Wextra -std=c++11
 LDFLAGS=-g
 LDLIBS=
 
-SRCS=src/main.cpp src/automata.cpp src/safra.cpp
+SRCS=src/main.cpp src/automata.cpp src/safra.cpp src/visualize.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 GOAL=safra
 

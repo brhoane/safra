@@ -97,7 +97,7 @@ namespace _cdm {
     stream << (FiniteStateMachine)bfsm;
 
     stream << bfsm.initial << "\n"
-           << bfsm.final;
+           << bfsm.final << "\n";
     return stream;
   }
 
