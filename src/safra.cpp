@@ -193,6 +193,7 @@ namespace _cdm {
         }
       }
     }
+    r.num_edges = trees.size() * r.num_letters;
     //for (auto it = trees.begin(); it != trees.end(); ++it) {
     //  std::cout << *it << "\n";
     //}

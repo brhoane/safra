@@ -12,6 +12,7 @@
 
 #include "automata.hpp"
 #include "safra.hpp"
+#include "visualize.hpp"
 
 namespace _cdm {
 
@@ -76,6 +77,6 @@ int main(int argc, char* argv[]) {
   std::cout << b1 << "\n";
   SafraGraph sg(b1);
   Rabin r1 = sg.make_rabin();
-
+  print_automaton(r1);
   return 0;
 }
