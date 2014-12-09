@@ -7,18 +7,19 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
+#include <string.h>
 #include <string>
 #include <iostream>
 #include <fstream>
 
 #include "automata.hpp"
 #include "safra.hpp"
-#include "visualize.hpp"
 
 namespace _cdm {
 
   struct Options {
     bool verbose;
+    bool convert_input;
     const char* input_filename;
     const char* output_filename;
   };
@@ -35,6 +36,8 @@ void print_usage(const char* prog_name) {
     "\n"                                                                \
     "\t-v:\n"                                                           \
     "\t\tPrints generated Safra Trees and transitions\n"                \
+    "\t-I:\n"                                                           \
+    "\t\tAlso convert input automaton to dot format\n"                  \
     "\tinput_wnfa:\n"                                                   \
     "\t\tThe Buchi Automata to load and determinize.\n"                 \
     "\t-o output_file:\n"                                               \
@@ -49,12 +52,16 @@ bool parse_args(Options* opt, int argc, char* argv[]) {
 
   opt->input_filename = argv[1];
   opt->output_filename = NULL;
+  opt->convert_input = false;
   opt->verbose = false;
   int gopt;
-  while ((gopt = getopt(argc, argv, "vo:")) != -1) {
+  while ((gopt = getopt(argc, argv, "vCo:")) != -1) {
     switch (gopt) {
     case 'v':
       opt->verbose = true;
+      break;
+    case 'C':
+      opt->convert_input = true;
       break;
     case 'o':
       opt->output_filename = optarg;
@@ -75,10 +82,13 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   Buechi b1(opt.input_filename);
-  std::cout << b1 << "\n";
   SafraGraph sg(b1);
   Rabin r1 = sg.make_rabin();
-  std::ofstream graph_out("graphs/graph.dot");
-  print_automaton(graph_out, r1);
+  std::ofstream graph_out(opt.output_filename);
+  r1.graphviz_out(graph_out);
+  if (opt.convert_input) {
+    std::ofstream graph_input_out("graphs/input.dot");
+    b1.graphviz_out(graph_input_out);
+  }
   return 0;
 }

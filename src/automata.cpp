@@ -46,13 +46,13 @@ namespace _cdm {
         case TRANSITIONS: {
           char *line_ptr = &line[0];
           char *nptr = strtok(line_ptr, " ");
-          int state1 = atoi(nptr);
+          int state1 = atoi(nptr) - 1;
 
           nptr = strtok(NULL, " "); assert(nptr);
-          int letter = atoi(nptr);
+          int letter = atoi(nptr) - 1;
 
           nptr = strtok(NULL, " "); assert(nptr);
-          int state2 = atoi(nptr);
+          int state2 = atoi(nptr) - 1;
 
           transition_edge e(transition(state1,letter), state2);
           edges.insert(e);
@@ -61,10 +61,10 @@ namespace _cdm {
           break;
         }
         case INITIAL:
-          initial = stoi(line);
+          initial = stoi(line) - 1;
           break;
         case FINAL:
-          final = stoi(line);
+          final = stoi(line) - 1;
           break;
         default:
           break;
@@ -100,5 +100,33 @@ namespace _cdm {
            << bfsm.final << "\n";
     return stream;
   }
-
+  
+  
+  void FiniteStateMachine::graphviz_body(std::ostream& stream) {
+    //for (int i=1; i<= fsm.num_states; i++) {
+    //  stream << i << "[label=\"" << i << "\",peripheries=2];\n";
+    //}
+    for (auto it = this->edges.cbegin();
+         it != this->edges.cend(); ++it) {
+      stream << it->first.first << "->" << it->second
+             << "[label=\"" << it->first.second << "\"];\n";
+    }
+  }
+  
+  void Buechi::graphviz_body(std::ostream& stream) {
+    stream << "a[shape=none, label=\"\"];\n"
+           << final << "[peripheries=2];\n"
+           << "a->" << initial << "\n";
+    FiniteStateMachine::graphviz_body(stream);
+  }
+  
+  void Rabin::graphviz_body(std::ostream& stream) {
+    FiniteStateMachine::graphviz_body(stream);
+  }
+  
+  void FiniteStateMachine::graphviz_out(std::ostream& stream) {
+    stream << "digraph G {\n";
+    graphviz_body(stream);
+    stream << "}\n";
+  }
 }

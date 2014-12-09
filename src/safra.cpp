@@ -181,29 +181,25 @@ namespace _cdm {
     Rabin r;
     r.num_states = 1;
     r.num_letters = buechi.num_letters;
+    r.initial = 1;
 
     for (unsigned int i=0; i < trees.size(); i++) {
-      for (int letter=1; letter <= r.num_letters; letter++) {
+      for (int letter=0; letter < r.num_letters; letter++) {
         SafraTree st = next_tree(trees[i], letter);
-
 
         auto find_tree = std::find(trees.begin(), trees.end(), st);
         int tree_index = find_tree - trees.begin();
         if (find_tree == trees.end()) {
           trees.push_back(st);
           tree_index = trees.size()-1;
+          r.num_states++;
         }
-        std::cout << i <<" EDGE "<<letter<<" TO "<<tree_index<<"\n";
         transition t(i, letter);
         transition_edge te(t, tree_index);
         r.edges.insert(te);
       }
     }
     r.num_edges = trees.size() * r.num_letters;
-    //for (auto it = trees.begin(); it != trees.end(); ++it) {
-    //  std::cout << *it << "\n";
-    //}
-    std::cout << r << "\n";
     return r;
   }
 }

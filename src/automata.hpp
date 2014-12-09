@@ -21,9 +21,11 @@ namespace _cdm {
     transition_graph edges;
 
     FiniteStateMachine() {}
-
+    
+    void graphviz_out(std::ostream& stream);
     friend std::ostream& operator<< (std::ostream& stream,
                                      const FiniteStateMachine& fsm);
+    virtual void graphviz_body(std::ostream& stream);
   };
 
   class Buechi : public FiniteStateMachine {
@@ -34,12 +36,14 @@ namespace _cdm {
     Buechi(const char* filename);
 
     friend std::ostream& operator<< (std::ostream& stream, const Buechi& bfsm);
+    virtual void graphviz_body(std::ostream& stream);
   };
 
   class Rabin : public FiniteStateMachine {
   public:
     int initial;
     std::vector<rabin_pair> accept;
+    virtual void graphviz_body(std::ostream& stream);
   };
 }
 
