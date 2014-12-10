@@ -56,14 +56,26 @@ namespace _cdm {
   }
   
   void NamePool::remove_names(SafraNode& sn) {
-    assert(pool[sn.name]);
-    pool[sn.name] = false;
+    assert(!pool[sn.name]);
+    pool[sn.name] = true;
     for (auto it=sn.children.begin(); it != sn.children.end(); ++it) {
       remove_names(*it);
     }
   }
   
+  std::ostream& operator<< (std::ostream& stream,
+                                   const NamePool& np) {
+    stream << "Name Pool: ";
+    for (unsigned int i = 0; i < np.size(); i++) {
+      stream << np[i];
+    }
+    stream << "\n";
+    return stream;
+  }
+  
   bool is_safra_node(const SafraNode& sn) {
+    if (sn.label.size() == 0) return false;
+    
     std::set<int> seen;
     unsigned int elements = 0;
     for (auto it =sn.children.cbegin(); it != sn.children.cend(); ++it) {
@@ -83,6 +95,7 @@ namespace _cdm {
   }
 
   bool SafraTree::is_safra_tree() {
+    if (root.name == -1) return true; // null tree
     return is_safra_node(root);
   }
   
@@ -112,13 +125,9 @@ namespace _cdm {
       print_node(stream, *it, depth+1);
     }
   }
-
+  
   std::ostream& operator<< (std::ostream& stream, const SafraTree& st) {
-    stream << "Name Pool: ";
-    for (unsigned int i = 0; i < st.name_pool.size(); i++) {
-      stream << st.name_pool[i];
-    }
-    stream << "\n";
+    stream << st.name_pool;
     print_node(stream, st.root, 0);
     return stream;
   }
@@ -147,7 +156,7 @@ namespace _cdm {
     for (auto it = sn.children.begin(); it != sn.children.end(); ++it) {
       create(*it, pool);
     }
-
+    
     if (sn.label.find(buechi.final) != sn.label.end()) {
       SafraNode child;
       child.name = pool.get_unused_name();
@@ -189,7 +198,11 @@ namespace _cdm {
   void SafraGraph::horizontal_merge_and_kill(SafraNode& sn,
                                              NamePool& pool) {
     std::set<int> seen;
-    scan_and_remove_seen(sn, seen, pool);
+    if (!scan_and_remove_seen(sn, seen, pool)) {
+      pool.remove_names(sn);
+      sn.children.erase(sn.children.begin(), sn.children.end());
+      sn.name = -1;
+    }
   }
 
   void SafraGraph::vertical_merge(SafraNode& sn, NamePool& pool) {
@@ -212,21 +225,23 @@ namespace _cdm {
 
   SafraTree SafraGraph::next_tree(SafraTree& st, int letter) {
     assert(st.is_safra_tree());
+    
+    if (st.root.name == -1) return st;
 
     SafraTree ret(buechi.num_states);
     ret.name_pool = st.name_pool;
-    std::cout << st << "\n";
+    //std::cout << st << "\n";
     ret.root = copy_unmark_update(st.root, letter);
-    std::cout << "UNMARK UPDATE\n" << ret << "\n";
+    //std::cout << "UNMARK UPDATE\n" << ret << "\n";
     create(ret.root, ret.name_pool);
-    std::cout << "CREATE\n" << ret << "\n";
+    //std::cout << "CREATE\n" << ret << "\n";
     horizontal_merge_and_kill(ret.root, ret.name_pool);
-    std::cout << "HMERGE KILL\n" << ret << "\n";
+    //std::cout << "HMERGE KILL\n" << ret << "\n";
     vertical_merge(ret.root, ret.name_pool);
-    std::cout << "VMERGE\n" << ret << "\n";
+    //std::cout << "VMERGE\n" << ret << "\n";
     return ret;
   }
-
+ 
   Rabin SafraGraph::make_rabin() {
     std::vector<SafraTree> trees;
     trees.push_back(SafraTree(buechi));
@@ -240,12 +255,14 @@ namespace _cdm {
     // trees.size() grows as we work, when we reach it we're done
     for (unsigned int i=0; i < trees.size(); i++) {
       for (int letter=0; letter < r.num_letters; letter++) {
-        std::cout << "---------("<<i<<") "<<letter<<"\n";
+        //std::cout << "---------("<<i<<") "<<letter<<"\n"
+        //          <<trees[i]<<"\n======\n";
         SafraTree st = next_tree(trees[i], letter);
 
         auto find_tree = std::find(trees.begin(), trees.end(), st);
         int tree_index = find_tree - trees.begin();
         if (find_tree == trees.end()) {
+          //std::cout << "("<<trees.size()<<")\n"<<st<<"\n";
           trees.push_back(st);
           tree_index = trees.size()-1;
           r.num_states++;
@@ -253,13 +270,13 @@ namespace _cdm {
         transition t(i, letter);
         transition_edge te(t, tree_index);
         r.edges.insert(te);
-        std::cout <<" ("<<tree_index<<")\n";
+        //std::cout <<" ("<<tree_index<<")\n";
       }
     }
     r.num_edges = trees.size() * r.num_letters;
     
     // Find Rabin Pairs
-    for (int i=1; i <= name_pool_max; i++) {
+    for (int i=0; i < name_pool_max; i++) {
       rabin_pair rp;
       for (unsigned int j=0; j < trees.size(); j++) {        
         switch (trees[j].find_name(i)) {

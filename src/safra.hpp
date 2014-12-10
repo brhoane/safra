@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <vector>
 #include <set>
-#include <queue>
 #include <map>
 #include <iostream>
 
@@ -36,6 +35,9 @@ namespace _cdm {
     void remove_names(SafraNode& sn);
     unsigned int size() const { return pool.size(); }
     bool operator[] (unsigned int n) const { return pool[n]; }
+    
+    friend std::ostream& operator<< (std::ostream& stream,
+                                     const NamePool& np);
   };
   
   class SafraTree {

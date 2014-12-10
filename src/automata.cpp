@@ -103,7 +103,7 @@ namespace _cdm {
   }
 
   std::ostream& operator <<(std::ostream& stream, const Rabin& rfsm) {
-    stream << "Rabin\n";
+    stream << "RABIN\n";
 
     stream << (FiniteStateMachine)rfsm;
 
@@ -147,6 +147,18 @@ namespace _cdm {
   void Rabin::graphviz_body(std::ostream& stream) {
     stream << "a[shape=none, label=\"\"];\n"
            << "a->" << initial << "\n";
+    for (int i=0; i < num_states; i++) {
+      stream << i << "[label=\""<<i;
+      for (unsigned int j = 0; j < accept.size(); j++) {
+        for (unsigned int k = 0; k < accept[j].first.size(); k++) {
+          if (accept[j].first[k] == i) stream << ",L"<<j;
+        }
+        for (unsigned int k = 0; k < accept[j].second.size(); k++) {
+          if (accept[j].second[k] == i) stream << ",R"<<j;
+        }
+      }
+      stream << "\"]\n";
+    }
     FiniteStateMachine::graphviz_body(stream);
   }
   
