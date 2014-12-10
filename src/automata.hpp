@@ -11,7 +11,7 @@ namespace _cdm {
   typedef std::pair<int, int> transition;
   typedef std::pair<transition, int> transition_edge;
   typedef std::multimap<transition, int> transition_graph;
-  typedef std::pair<std::set<int>, std::set<int> > rabin_pair;
+  typedef std::pair<std::vector<int>, std::vector<int> > rabin_pair;
 
   class FiniteStateMachine {
   public:
@@ -35,8 +35,9 @@ namespace _cdm {
 
     Buechi(const char* filename);
 
-    friend std::ostream& operator<< (std::ostream& stream, const Buechi& bfsm);
     virtual void graphviz_body(std::ostream& stream);
+    friend std::ostream& operator<< (std::ostream& stream,
+                                     const Buechi& bfsm);
   };
 
   class Rabin : public FiniteStateMachine {
@@ -44,6 +45,8 @@ namespace _cdm {
     int initial;
     std::vector<rabin_pair> accept;
     virtual void graphviz_body(std::ostream& stream);
+    friend std::ostream& operator<< (std::ostream& stream,
+                                     const Rabin& rfsm);
   };
 }
 

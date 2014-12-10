@@ -79,7 +79,11 @@ namespace _cdm {
     }
   }
 
-  std::ostream& operator <<(std::ostream& stream, const FiniteStateMachine& fsm) {
+  std::ostream& operator <<(std::ostream& stream,
+                            const FiniteStateMachine& fsm) {
+    stream << fsm.num_states << "\n"
+           << fsm.num_letters << "\n"
+           << fsm.num_edges << "\n";
     for (auto it = fsm.edges.cbegin(); it != fsm.edges.cend(); ++it) {
       stream << it->first.first << ' '  // from state
              << it->first.second << ' ' // letter
@@ -89,15 +93,35 @@ namespace _cdm {
   }
 
   std::ostream& operator <<(std::ostream& stream, const Buechi& bfsm) {
-    stream << "BUECHI\n"
-           << bfsm.num_states << "\n"
-           << bfsm.num_letters << "\n"
-           << bfsm.num_edges << "\n";
+    stream << "BUECHI\n";
 
     stream << (FiniteStateMachine)bfsm;
 
     stream << bfsm.initial << "\n"
            << bfsm.final << "\n";
+    return stream;
+  }
+
+  std::ostream& operator <<(std::ostream& stream, const Rabin& rfsm) {
+    stream << "Rabin\n";
+
+    stream << (FiniteStateMachine)rfsm;
+
+    for (auto it =rfsm.accept.cbegin(); it != rfsm.accept.cend(); ++it) {
+      stream << "(";
+      for (unsigned int j = 0; j < it->first.size(); j++) {
+        stream << it->first[j];
+        if (j < it->first.size()-1) stream << ",";
+      }
+      stream << "),(";
+      for (unsigned int j = 0; j < it->second.size(); j++) {
+        stream << it->second[j];
+        if (j < it->second.size()-1) stream << ",";
+      }
+      stream << ")\n";
+    }
+
+    stream << rfsm.initial << "\n";
     return stream;
   }
   
@@ -121,6 +145,8 @@ namespace _cdm {
   }
   
   void Rabin::graphviz_body(std::ostream& stream) {
+    stream << "a[shape=none, label=\"\"];\n"
+           << "a->" << initial << "\n";
     FiniteStateMachine::graphviz_body(stream);
   }
   

@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
   Buechi b1(opt.input_filename);
   SafraGraph sg(b1);
   Rabin r1 = sg.make_rabin();
+  std::cout << r1 << "\n";
   std::ofstream graph_out(opt.output_filename);
   r1.graphviz_out(graph_out);
   if (opt.convert_input) {
