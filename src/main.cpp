@@ -1,7 +1,12 @@
 /**
- * @brief Reads buchi and outputs rabin automaton
+ * @file
+ * @author  Brandon Hoane <bhoane@andrew.cmu.edu>
+ * @version 1.0
  *
- * @author Brandon Hoane (bhoane)
+ * @brief Main file for the safra project.
+ *
+ * This program reads a buechi automaton and outputs a
+ * determinized Rabin Automaton.
  */
 
 #include <stdlib.h>
@@ -16,7 +21,10 @@
 #include "safra.hpp"
 
 namespace _cdm {
-
+  
+  /**
+   * Stores command line options.
+   */
   struct Options {
     bool verbose;
     const char* convert_filename;
@@ -28,6 +36,10 @@ namespace _cdm {
 
 using namespace _cdm;
 
+/**
+ * Prints the usage docstring for this program.
+ * @param prog_name the file name of the executable
+ */
 void print_usage(const char* prog_name) {
   std::cout << "Usage: " << prog_name <<
     " input_wnfa [-v] [-o output_file] [-c convert_file]\n"
@@ -45,6 +57,12 @@ void print_usage(const char* prog_name) {
     "Without this option, output will be written to standard out.\n";
   }
 
+/**
+ * Parses the command line options with getopt.
+ * @param opt options struct in which to save arguments.
+ * @param argc number of arguments
+ * @param argv array of arguments
+ */
 bool parse_args(Options* opt, int argc, char* argv[]) {
   if (argc < 2) {
     print_usage(argv[0]);

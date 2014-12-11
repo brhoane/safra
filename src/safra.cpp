@@ -7,11 +7,12 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <map>
 
 namespace _cdm {
 
   bool SafraNode::operator==(const SafraNode &other) const {
-    if (name != other.name || mark != other.mark) {
+    if (name != other.name && mark == other.mark) {
       return false;
     }
     auto it = label.begin();
@@ -19,7 +20,51 @@ namespace _cdm {
     for (; it != label.end() && oit != other.label.end(); ++it, ++oit) {
       if (*it != *oit) return false;
     }
-    return it == label.end() && oit == other.label.end();
+    if (it != label.end() || oit != other.label.end()) {
+      return false;
+    }
+    auto child = children.begin();
+    auto ochild = other.children.begin();
+    for (; child != children.end() && ochild != other.children.end();
+         ++child, ++ochild) {
+      if (*child != *ochild) return false;
+    }
+    return child == children.end() && ochild == other.children.end();
+  }
+  
+  bool SafraNode::operator< (const SafraNode &other) const {
+    if (name < other.name) return true;
+    else if (other.name < name) return false;
+    
+    if (!mark && other.mark) return true;
+    else if (!other.mark && mark) return false;
+    
+    auto it = label.begin();
+    auto oit = other.label.begin();
+    for (; it != label.end() && oit != other.label.end(); ++it, ++oit) {
+      if (*it < *oit) return true;
+      else if (*oit < *it) return false;
+    }
+    
+    if (it == label.end() && oit != other.label.end())
+      return true;
+    else if (oit == other.label.end() && it != label.end())
+      return false;
+    
+    auto ch = children.begin();
+    auto och = other.children.begin();
+    for (; ch != children.end() && och != other.children.end();
+         ++ch, ++och) {
+      if (*ch < *och) return true;
+      else if (*och < *ch) return false;
+    }
+    
+    if (ch == children.end() && och != other.children.end())
+      return true;
+    else if (och == other.children.end() && ch != children.end())
+      return false;
+    
+    return false;
   }
 
   std::ostream& operator<< (std::ostream& stream, const SafraNode& sn) {
@@ -104,7 +149,7 @@ namespace _cdm {
       return FOUND_MARKED;
     }
     bool found = sn.name == name;
-    for (auto it = sn.children.cbegin(); it != sn.children.cend(); ++it) {
+    for (auto it=sn.children.cbegin(); it != sn.children.cend(); ++it) {
       enum find_status fs = find_name_node(name, *it);
       if (fs == FOUND_MARKED) return fs;
       else if (fs == FOUND) found = true;
@@ -230,22 +275,24 @@ namespace _cdm {
 
     SafraTree ret(buechi.num_states);
     ret.name_pool = st.name_pool;
-    //std::cout << st << "\n";
     ret.root = copy_unmark_update(st.root, letter);
-    //std::cout << "UNMARK UPDATE\n" << ret << "\n";
     create(ret.root, ret.name_pool);
-    //std::cout << "CREATE\n" << ret << "\n";
     horizontal_merge_and_kill(ret.root, ret.name_pool);
-    //std::cout << "HMERGE KILL\n" << ret << "\n";
     vertical_merge(ret.root, ret.name_pool);
-    //std::cout << "VMERGE\n" << ret << "\n";
     return ret;
   }
  
   Rabin SafraGraph::make_rabin() {
-    std::vector<SafraTree> trees;
-    trees.push_back(SafraTree(buechi));
-
+    typedef std::map<SafraTree, int> tree_map;
+    
+    std::vector<tree_map::iterator> tree_test;
+    std::vector<SafraTree> tree_states;
+    tree_map trees;
+    SafraTree start(buechi);
+    tree_states.push_back(start);
+    auto inserted = trees.insert(std::pair<SafraTree,int>(start,0));
+    tree_test.push_back(inserted.first);
+    
     Rabin r;
     r.num_states = 1;
     r.num_letters = buechi.num_letters;
@@ -253,33 +300,35 @@ namespace _cdm {
     
     // Compute the closure of the transition operation next_tree
     // trees.size() grows as we work, when we reach it we're done
-    for (unsigned int i=0; i < trees.size(); i++) {
+    for (unsigned int i=0; i < tree_states.size(); i++) {
       for (int letter=0; letter < r.num_letters; letter++) {
-        //std::cout << "---------("<<i<<") "<<letter<<"\n"
-        //          <<trees[i]<<"\n======\n";
-        SafraTree st = next_tree(trees[i], letter);
-
-        auto find_tree = std::find(trees.begin(), trees.end(), st);
-        int tree_index = find_tree - trees.begin();
+        SafraTree st = next_tree(tree_states[i], letter);
+        
+        int tree_index;
+        auto find_tree = trees.find(st);
+        
         if (find_tree == trees.end()) {
-          //std::cout << "("<<trees.size()<<")\n"<<st<<"\n";
-          trees.push_back(st);
-          tree_index = trees.size()-1;
+          tree_states.push_back(st);
+          tree_index = tree_states.size()-1;
+          auto ins = std::pair<SafraTree,int>(st, tree_index);
+          auto res = trees.insert(ins);
+          tree_test.push_back(res.first);
           r.num_states++;
+        } else {
+          tree_index = find_tree->second;
         }
         transition t(i, letter);
         transition_edge te(t, tree_index);
         r.edges.insert(te);
-        //std::cout <<" ("<<tree_index<<")\n";
       }
     }
     r.num_edges = trees.size() * r.num_letters;
     
     // Find Rabin Pairs
-    for (int i=0; i < name_pool_max; i++) {
+    for (int i=0; i < buechi.num_states * 2; i++) {
       rabin_pair rp;
-      for (unsigned int j=0; j < trees.size(); j++) {        
-        switch (trees[j].find_name(i)) {
+      for (unsigned int j=0; j < tree_states.size(); j++) {        
+        switch (tree_states[j].find_name(i)) {
         case NOT_FOUND:
           rp.first.push_back(j);
           break;

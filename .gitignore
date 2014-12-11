@@ -6,3 +6,8 @@ safra
 *.pdf
 *.aux
 graphs
+html/
+latex/
+*.db
+*~
+#*#
