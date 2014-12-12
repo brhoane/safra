@@ -1,3 +1,12 @@
+/**
+ * @file
+ * @author  Brandon Hoane <bhoane@andrew.cmu.edu>
+ * @version 1.0
+ *
+ * @brief Provides classes to represent Safra Trees
+ * and to determinize Buechi automata.
+ */
+
 #ifndef _cdm_SAFRA_HPP_
 #define _cdm_SAFRA_HPP_
 
