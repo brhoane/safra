@@ -1,3 +1,4 @@
+/**@mainpage
 ### Safra Determinization ###
 
 An implementation of Saftra's determinization algorithm on omega-automata.
@@ -16,3 +17,4 @@ If output_file is not provides, outputs to standard out instead.
 The output format is graphviz's dot file format.
 
 If convert_file is provided, the input file is also converted to dot file format and written to convert_file.
+*/
