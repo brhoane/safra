@@ -32,13 +32,15 @@ namespace _cdm {
     std::set<int> label;
     bool mark;
     std::vector<SafraNode> children;
-    /**Two nodes are equal iff their names, labels, marks,
+    /**@brief Two nodes are equal iff their names, labels, marks,
      * and children are equal.
      */
     bool operator==(const SafraNode &other) const;
     bool operator!=(const SafraNode &other) const {
       return !(*this == other);
     }
+    /**@brief Lexicographically compares names, marks, labels, and children.
+     */
     bool operator<(const SafraNode &other) const;
   };
   std::ostream& operator<< (std::ostream& stream, const SafraNode& sn);
