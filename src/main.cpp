@@ -26,7 +26,6 @@ namespace _cdm {
    * Stores command line options.
    */
   struct Options {
-    bool verbose;
     const char* convert_filename;
     const char* input_filename;
     const char* output_filename;
@@ -46,8 +45,6 @@ void print_usage(const char* prog_name) {
     "\n"                                                                \
     "Options:"                                                          \
     "\n"                                                                \
-    "\t-v:\n"                                                           \
-    "\t\tPrints generated Safra Trees and transitions\n"                \
     "\t-c convert_file:\n"                                              \
     "\t\tConvert input automaton to dot format in convert_file.\n"      \
     "\tinput_wnfa:\n"                                                   \
@@ -72,13 +69,9 @@ bool parse_args(Options* opt, int argc, char* argv[]) {
   opt->input_filename = argv[1];
   opt->output_filename = NULL;
   opt->convert_filename = NULL;
-  opt->verbose = false;
   int gopt;
-  while ((gopt = getopt(argc, argv, "vc:o:")) != -1) {
+  while ((gopt = getopt(argc, argv, "c:o:")) != -1) {
     switch (gopt) {
-    case 'v':
-      opt->verbose = true;
-      break;
     case 'c':
       opt->convert_filename = optarg;
       break;
