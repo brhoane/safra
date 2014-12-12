@@ -9,7 +9,7 @@ Just run make!
 
 ### Usage ###
 
-./safra <input_file> [-o <output_file>] [-c <convert_file>]
+./safra input_file [-o output_file] [-c convert_file]
 
 Reads in a Buechi automaton in input_file.
 Outputs the corresponding Rabin automaton in output_file.
