@@ -85,14 +85,14 @@ namespace _cdm {
     SafraTree(const Buechi& b);
     
     /**@brief Checks the node invariants for this tree. */
-    bool is_safra_tree();
+    bool is_safra_tree() const;
     /**@brief Finds a name in the tree.
      * 
      * @return \li FOUND_MARKED if name is in a marked node in this tree.
      * \li FOUND if name appears in only unmarked nodes.
      * \li NOT_FOUND if name does not appear at all.
      */
-    enum find_status find_name(int name);
+    enum find_status find_name(int name) const;
     bool operator==(const SafraTree &other) const {
       return root == other.root;
     } 
@@ -123,7 +123,7 @@ namespace _cdm {
      *
      * @return the result of the transition function
      */
-    SafraTree next_tree(SafraTree& st, int letter);
+    SafraTree next_tree(const SafraTree& st, int letter);
     /*@brief Construct a Rabin automaton from the provided Buechi.
      *
      * Computes the closure of next_tree on all letters and the
